@@ -27,6 +27,12 @@ A high-performance, programmable DNS rebinding tool for security researchers. `r
 
 Your firewall rules should look like this:
 
+| Protocol | Port | Source    |
+| -------- | ---- | --------- |
+| TCP      | 22   | 0.0.0.0/0 |
+| UDP      | 53   | 0.0.0.0/0 |
+| TCP      | 8080 | 0.0.0.0/0 |
+
 * Allow SSH (not required if you are not accessing your server via SSH)
 
 ```bash
@@ -45,13 +51,15 @@ sudo ufw allow 53/udp
 sudo ufw allow 8080/tcp
 ```
 
-| Protocol | Port | Source    |
-| -------- | ---- | --------- |
-| TCP      | 22   | 0.0.0.0/0 |
-| UDP      | 53   | 0.0.0.0/0 |
-| TCP      | 8080 | 0.0.0.0/0 |
-
 ## Quick Start
+
+```bash
+git clone https://github.com/baibhavanand/rebindx
+```
+
+```bash
+cd rebindx
+```
 
 **Without Docker:**
 
