@@ -109,6 +109,27 @@ const dashboardTemplate = `
 
         .logo span { color: var(--text-dim); }
 
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+
+        .github-link:hover {
+            color: var(--primary);
+            background: rgba(0, 255, 157, 0.05);
+            border-color: rgba(0, 255, 157, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+        }
+
         .grid {
             display: grid;
             grid-template-columns: 380px 1fr;
@@ -369,7 +390,13 @@ const dashboardTemplate = `
 <body>
     <div class="container">
         <header>
-            <div class="logo">rebind<span>x</span></div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="logo">rebind<span>x</span></div>
+                <a href="https://github.com/baibhavanand/rebindx" target="_blank" class="github-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    <span>GitHub</span>
+                </a>
+            </div>
             <div class="refresh-controls">
                 <label class="auto-refresh-label">
                     <input type="checkbox" id="auto-refresh">
@@ -566,17 +593,40 @@ const dashboardTemplate = `
 
         async function copyToClipboard() {
             const text = document.getElementById('generated-url').innerText;
-            try {
-                await navigator.clipboard.writeText(text);
-                const box = document.getElementById('generated-url');
-                const originalText = box.innerText;
+            const box = document.getElementById('generated-url');
+            const originalText = box.innerText;
+
+            const success = async () => {
                 box.innerText = 'COPIED TO CLIPBOARD!';
                 box.style.borderColor = '#00e5ff';
                 setTimeout(() => {
                     box.innerText = originalText;
                     box.style.borderColor = '#00ff9d';
                 }, 1000);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    await success();
+                    return;
+                } catch (err) {}
+            }
+
+            // Fallback for non-HTTPS
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                await success();
             } catch (err) {}
+            document.body.removeChild(textArea);
         }
 
         async function fetchData() {
